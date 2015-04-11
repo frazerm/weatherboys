@@ -2,7 +2,8 @@ var Weather = Weather || {};
 
 Weather.mapWrapper = (function () {
 
-    var initialMapCenter = [10, 50];
+    var initialMapCenter = [10, 50],
+        mapReady = false;
 
     var MapWrapper = function (mapCanvasId) {
         this.mapCanvasId = mapCanvasId;
@@ -21,73 +22,79 @@ Weather.mapWrapper = (function () {
                 'esri/dijit/Geocoder',
                 'esri/symbols/SimpleMarkerSymbol',
                 'esri/graphic',
+                'esri/config',
                 'dojo/_base/Color',
                 'dojo/dom',
                 'dojo/domReady!'
             ], function(
-                Map, Geocoder, SimpleMarkerSymbol, Graphic, Color, dom
+                Map, Geocoder, SimpleMarkerSymbol, Graphic, esriConfig, Color, dom
             ) {
+                esriConfig.defaults.map.panDuration = 1;
+                esriConfig.defaults.map.panRate = 1;
+
                 that.map = new Map('map-canvas', {
-                    basemap: 'dark-gray',
+                    basemap: 'terrain',
                     center: initialMapCenter,
                     zoom: 5
                 });
                 that.map.on('load', function() {
-                    map.hideZoomSlider();
+                    //that.map.hideZoomSlider();
+
+                    mapReady = true;
+
+                    /*var geocoder = new Geocoder({
+                        autoComplete: true,
+                        map: that.map,
+                    }, dom.byId('search-container'));
+                    geocoder.startup();
+                    geocoder.on('select', function (event) {
+                        that.map.graphics.clear();
+
+                        var point = event.result.feature.geometry,
+                            symbol = new SimpleMarkerSymbol()
+                                .setStyle('square')
+                                .setColor(new Color([255,0,0,0.5])),
+                            graphic = new Graphic(point, symbol);
+
+                        that.map.graphics.add(graphic);
+                        that.map.infoWindow.setTitle('Search Result');
+                        that.map.infoWindow.setContent(event.result.name);
+                        that.map.infoWindow.show(event.result.feature.geometry);
+                    });
+
+                    document.getElementById('search-container_input').focus();*/
+
+
                 });
-
-                var geocoder = new Geocoder({
-                    autoComplete: true,
-                    map: that.map,
-                }, dom.byId('search-container'));
-                geocoder.startup();
-                geocoder.on('select', function (event) {
-                    that.map.graphics.clear();
-
-                    var point = event.result.feature.geometry,
-                        symbol = new SimpleMarkerSymbol()
-                            .setStyle('square')
-                            .setColor(new Color([255,0,0,0.5])),
-                        graphic = new Graphic(point, symbol);
-
-                    that.map.graphics.add(graphic);
-                    that.map.infoWindow.setTitle('Search Result');
-                    that.map.infoWindow.setContent(event.result.name);
-                    that.map.infoWindow.show(event.result.feature.geometry);
-                });
-
-                document.getElementById('search-container_input').focus();
             });
         },
 
 
         panByDelta: (function () {
-            var previousCenter = {
-                    x: initialMapCenter[0],
-                    y: initialMapCenter[1]
-                },
-                panning = false;
+            var previousCenter = initialMapCenter.slice(), // Cloning the array
+                panning = false,
+                velocityScale = 0.005;
 
-            return function(delta) {
-                if (panning) { // Already panning, ignore this call.
+            return function(velocity) {
+                if (panning || !mapReady) { // Already panning, ignore this call.
                     return;
                 }
 
                 var that = this;
-                require(['esri/geometry/ScreenPoint', 'esri/geometry/webMercatorUtils'], function (ScreenPoint, webMercatorUtils){
-                    var zoom = that.map.getLevel(),
-                        center = webMercatorUtils.webMercatorToGeographic(that.map.extent.getCenter());
+                require(['esri/geometry/Point', 'esri/geometry/webMercatorUtils'], function (Point, webMercatorUtils){
+                    var zoom = that.map.getLevel();
 
-                    console.log('should pan', delta, center);
-
-                    var newCenter = {
-                        x: center.x + 0.2 * delta[0],
-                        y: center.y + 0.2 * delta[1]
-                    };
+                    //console.log(velocity);
+                    var newCenter = new Point(
+                        previousCenter[0] + velocityScale * velocity[0],
+                        previousCenter[1] + velocityScale * velocity[1]
+                    );
 
                     panning = true;
-                    that.map.centerAt(delta).then(function () {
+                    that.map.centerAt(newCenter).then(function () {
                         panning = false;
+                        previousCenter[0] = newCenter.x;
+                        previousCenter[1] = newCenter.y;
                     })
                 });
             }
@@ -97,7 +104,7 @@ Weather.mapWrapper = (function () {
             var zooming = false;
 
             return function (zoomChange) {
-                if (zooming) {
+                if (zooming || !mapReady) {
                     return;
                 }
                 zooming = true;
