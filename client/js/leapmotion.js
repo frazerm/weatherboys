@@ -19,6 +19,8 @@ var zoom = function (rate) {
 var output = document.getElementById('output');
 var SENSITIVITY = 1;
 
+var Z_SENSITIVITY = 200;
+
 var grabLast = 0;
 
 Leap.loop(function (frame) {
@@ -27,22 +29,26 @@ Leap.loop(function (frame) {
         handTwo = frame.hands[1]
 
         if(handTwo) {
-            //two hands, do a zoom
-            dist = Math.sqrt(handOne.indexFinger.tipPosition[0]*handOne.indexFinger.tipPosition[0] +
-                handOne.indexFinger.tipPosition[1]*handOne.indexFinger.tipPosition[1])
+            console.log(handTwo);
+            if (Math.abs(handOne.palmVelocity[2]) < Z_SENSITIVITY &&
+                Math.abs(handTwo.palmVelocity[2]) < Z_SENSITIVITY) {
+                //two hands, do a zoom
 
-            delta = dist - grabLast
+                dist = Math.sqrt(handOne.indexFinger.tipPosition[0]*handOne.indexFinger.tipPosition[0] +
+                    handOne.indexFinger.tipPosition[1]*handOne.indexFinger.tipPosition[1])
 
-            if(Math.abs(delta) > SENSITIVITY) {
-                zoom(delta);
-            };
+                delta = dist - grabLast
 
-            grabLast = dist;
+                if(Math.abs(delta) > SENSITIVITY) {
+                    zoom(delta);
+                };
 
+                grabLast = dist;
+            }
         } else if(handOne && handOne.indexFinger.tipPosition[2] < 0) {
             var velocity = handOne.indexFinger.tipVelocity;
 
-            if (Math.abs(velocity[2]) < 200) { // Ignoring velocities with too large of a z component
+            if (Math.abs(velocity[2]) < Z_SENSITIVITY) { // Ignoring velocities with too large of a z component
                 Weather.mapWrapper.panByDelta(velocity);
             }
             //console.log("One finger press");
