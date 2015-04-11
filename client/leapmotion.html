@@ -14,6 +14,22 @@
     <div id="output"></div>
 
     <script>
+        var toType = function(obj) {
+            return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+        }
+
+        var spinClockwise = function () {
+            console.log("spin clockwise")
+        }
+
+        var spinAnticlockwise = function () {
+            console.log("spin anticlockwise")
+        }
+
+        var pan = function (x, y) {
+            console.log("Pan by: " + x + ", " + y);
+        }
+
         var output = document.getElementById('output');
         var SENSITIVITY = 1
 
@@ -36,19 +52,28 @@
                     //check for pan
                     if(touchLast.length > 0) {
                         delta = [indexPos[0] - touchLast[0], indexPos[1] - touchLast[1]];
-                        if(Math.sqrt(delta[0]^2 + delta[1]^2) < SENSITIVITY) {
-                            delta = [0, 0]
+                        if(Math.abs(delta[0]) < SENSITIVITY) {
+                            delta[0] = 0;
                         }
-                        console.log(delta);
+                        if(Math.abs(delta[1]) < SENSITIVITY) {
+                            delta[1] = 0;
+                        }
+                        if(delta[0] || delta[1]) {
+                            pan(delta[0], delta[1])
+                        }
                     };
                     touchLast = [indexPos[0], indexPos[1]];
                     console.log("One finger press");
                 } else if(frame.gestures.length > 0) {
                     touchLast = [];
                     frame.gestures.forEach(function(gesture) {
-                        console.log(gesture)
-                    });
+                        if(gesture.center) {
+                            //got a circlegesture
 
+                            var normal = gesture.normal
+                            normal[0] < 0 ? spinClockwise() : spinAnticlockwise();
+                        }
+                    });
                 } else {
                     touchLast = [];
                 };
