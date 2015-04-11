@@ -72,8 +72,7 @@ Weather.mapWrapper = (function () {
 
         panByDelta: (function () {
             var previousCenter = initialMapCenter.slice(), // Cloning the array
-                panning = false,
-                velocityScale = 0.005;
+                panning = false;
 
             return function(velocity) {
                 if (panning || !mapReady) { // Already panning, ignore this call.
@@ -84,11 +83,11 @@ Weather.mapWrapper = (function () {
                 require(['esri/geometry/Point', 'esri/geometry/webMercatorUtils'], function (Point, webMercatorUtils){
                     var zoom = that.map.getLevel();
 
-                    //console.log(velocity);
-                    var newCenter = new Point(
-                        previousCenter[0] + velocityScale * velocity[0],
-                        previousCenter[1] + velocityScale * velocity[1]
-                    );
+                    var velocityScale = 1/(Math.pow(2, 1.3 * zoom)),
+                        newCenter = new Point(
+                            previousCenter[0] + velocityScale * velocity[0],
+                            previousCenter[1] + velocityScale * velocity[1]
+                        );
 
                     panning = true;
                     that.map.centerAt(newCenter).then(function () {
