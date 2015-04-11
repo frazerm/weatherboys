@@ -1,19 +1,57 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <!--The viewport meta tag is used to improve the presentation and behavior of the samples 
-      on iOS devices-->
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
-    <title>Class Breaks Renderer</title>
+// var toType = function(obj) {
+//     return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+// }
 
-    <script src="http://js.leapmotion.com/leap-0.6.4.js"></script>
-  </head>
-  
-  <body>
-    <div id="output"></div>
+// var SENSITIVITY = 10
 
-    <script>
+// var touchLast = []
+
+// Leap.loop(function (frame) {
+//     if(frame.valid) {
+//         handOne = frame.hands[0]
+//         handTwo = frame.hands[1]
+
+//         if(handTwo) {
+//             //two hands, do a zoom
+//             touchLast = [];
+//             indexPosOne = handOne.indexFinger.tipPosition;
+//             indexPosTwo = handTwo.indexFinger.tipPosition;
+
+//             console.log("Two fingers");
+//         } else if(handOne && handOne.indexFinger.tipPosition[2] < 0) {
+//             indexPos = handOne.indexFinger.tipPosition;
+//             //check for pan
+//             if(touchLast.length > 0) {
+//                 delta = [indexPos[0] - touchLast[0], indexPos[1] - touchLast[1]];
+//                 if(Math.abs(delta[0]) < SENSITIVITY) {
+//                     delta[0] = 0;
+//                 }
+//                 if(Math.abs(delta[1]) < SENSITIVITY) {
+//                     delta[1] = 0;
+//                 }
+//                 if(delta[0] || delta[1]) {
+//                     Weather.mapWrapper.panByDelta(delta);
+//                     //pan(delta[0], delta[1])
+//                 }
+//             };
+//             touchLast = [indexPos[0], indexPos[1]];
+//             console.log("One finger press");
+//         } else if(frame.gestures.length > 0) {
+//             touchLast = [];
+//             frame.gestures.forEach(function(gesture) {
+//                 if(gesture.center) {
+//                     //got a circlegesture
+
+//                     var normal = gesture.normal;
+//                     normal[0] < 0 ? Weather.mapWrapper.zoomIn() : Weather.mapWrapper.zoomOut();
+//                 }
+//             });
+//         } else {
+//             touchLast = [];
+//         };
+//     }
+
+// });
         var spinClockwise = function () {
             console.log("spin clockwise")
         }
@@ -23,11 +61,11 @@
         }
 
         var pan = function (x, y) {
-            console.log("Pan by: " + x + ", " + y);
+            Weather.mapWrapper.panByDelta([x, y]);
         }
 
         var zoom = function (rate) {
-            rate > 0 ? console.log("zoom in by: " + rate) : console.log("zoom out by: " + rate)
+            rate > 0 ? Weather.mapWrapper.zoomIn() : Weather.mapWrapper.zoomOut();
             
         }
 
@@ -92,7 +130,3 @@
             }
 
         });
-</script>
-  </body>
-
-</html>
