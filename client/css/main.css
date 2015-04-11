@@ -1,0 +1,17 @@
+html, body, #mapDiv {
+    padding:0;
+    margin:0;
+    height:100%;
+}
+#map-canvas {
+    height: 100%;
+    position: relative;
+}
+#search-container {
+    height: 2em;
+    position: absolute;
+    right: 6em;
+    top: 2em;
+    width: 10em;
+    z-index: 99;
+}
