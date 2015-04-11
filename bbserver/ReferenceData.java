@@ -15,6 +15,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 public class ReferenceData {
+    // Changed to HistoricalDataRequest.
     public static final String apiUrl = "https://http-api.openbloomberg.com"
         + "/request?ns=blp&service=refdata&type=ReferenceDataRequest";
     public static final String keyStorePW = "secure";
