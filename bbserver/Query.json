@@ -1,0 +1,9 @@
+{ "securities": ["WER5LOND ACTU Index"],
+
+  "fieldID": ["PRECIPITATION_REALTIME"],
+
+  "startDate": "20120101",
+
+  "endDate": "20120105",
+
+  "periodicitySelection": "DAILY" }

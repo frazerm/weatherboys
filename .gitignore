@@ -1,2 +1,7 @@
 .idea
 weatherboys.iml
+bbserver/bloomberg.crt
+bbserver/bloomberg.jks
+bbserver/client.crt
+bbserver/client.key
+bbserver/client.p12
